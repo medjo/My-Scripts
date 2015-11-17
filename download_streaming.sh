@@ -20,12 +20,15 @@ DIR_VID=$HOME/Vidéos/From_Web
 DIR_VID_LATER=$HOME/Vidéos/From_Web/To_Watch_Later
 
 # Directory in which will be downloade musics
-DIR_MUSIC=$HOME/Téléchargements
+DIR_MUSIC=$HOME/Téléchargements/Musique
 
 # File in which will be stored the videos watched and downloaded
 LOG_FILE=$DIR_VID/history.log
 
 FILENAME_FILE=/tmp/filename_file
+
+AUDIO_QUALITY=192k
+AUDIO_FORMAT=mp3
 
 PLAYER="vlc --no-video-title-show"
 
@@ -159,9 +162,11 @@ if [ $MUSIC = "TRUE" ]; then
   elif [ $STREAMING = "TRUE" ]; then
     #Listening to music in streaming without keeping the music
     echo Listening to music in streaming without keeping the music
+    $YTDL -x -g $MEDIA_URL | xargs $PLAYER
   else
     #Downloading music in $DIR_MUSIC without listening to it
     echo Downloading music in $DIR_MUSIC without listening to it
+    $YTDL -x --audio-format $AUDIO_FORMAT --audio-quality $AUDIO_QUALITY
   fi
 else
   #A video will be downloaded or listened in streaming or watched later
