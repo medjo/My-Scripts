@@ -1,0 +1,122 @@
+#!/bin/sh
+data=/home/communication/log_gateway.csv
+cnt_file=/home/communication/cnt_file
+
+read_data() {
+	cnt=0 #Compteur du Nombre de lignes dans le fichier data = Nombre de messages reçus + 1
+	while read line
+    do
+        IFS='"' #IFS = Internal Field Separator
+        if [ $cnt -gt $prev_cnt ] ; then #on ne compte qu'à partir du dernier message "vu" précédemment
+            set -- $line #éclatement de la ligne en paramètres positionnels
+            #echo "CRC Value = $8\n"
+			if [ -z ${8+x}  ]; then
+			    echo $line
+    			    echo "\$8 is unset"
+    			exit 1
+			fi
+            CRC=$8
+            if [ "$CRC" = "CRC_OK" ] ; then
+                cnt_OK=$(($cnt_OK + 1))
+                #echo CRC is CRC_OK
+            elif [ "$CRC" = "CRC_BAD" ] ; then
+                #echo CRC is CRC_BAD
+                cnt_BAD=$(($cnt_BAD + 1))
+            elif [ "$CRC" = "NO_CRC" ] ; then
+                #echo CRC is NO_CRC
+               	cnt_NO=$(($cnt_NO + 1))
+            else
+                cnt_UNDEF=$(($cnt_UNDEF + 1))
+            fi
+        fi
+        cnt=$(($cnt+1))
+    done < $data
+}
+
+
+if [ -f $data ] ; then
+    #echo Le fichier $data existe !
+    prev_cnt=0
+    cnt=0 #Compteur du Nombre de lignes dans le fichier $cnt_file
+    cnt_OK=0 #Nombre de CRC_OK
+    cnt_BAD=0 #Nombre de CRC_BAD
+    cnt_NO=0 #Nombre de NO_CRC
+    cnt_UNDEF=0 #Nombre de UNDEF
+    log_file=0 #Numéro du fichier de log
+    if [ -f $cnt_file ] ; then
+        #echo Le fichier $cnt_file existe !
+        while read line
+        do
+            set -- $line #éclatement de la ligne en paramètres positionnels
+            if [ -z ${2+x}  ]; then
+                echo "\$2 is unset"
+                exit 1
+            fi
+            if [ $cnt -eq 0 ] ; then
+                prev_cnt=$2
+            elif [ $cnt -eq 1 ] ; then
+                cnt_OK=$2
+            elif [ $cnt -eq 2 ] ; then
+                cnt_BAD=$2
+            elif [ $cnt -eq 3 ] ; then
+                cnt_NO=$2
+            elif [ $cnt -eq 4 ] ; then
+                cnt_UNDEF=$2
+            elif [ $cnt -eq 5 ] ; then
+                log_file=$2
+            fi
+            #echo "$cnt -> $2"
+            cnt=$(($cnt+1))
+        done < $cnt_file
+    fi
+    read_data
+    if [ $prev_cnt -gt $cnt ] ; then #Si dépassement du compteur on créé un nouveau fichier de log
+    	#echo "Il y a un dépassement du compteur cnt"
+    	cnt_limit=$prev_cnt
+    	prev_cnt=0
+    	cnt=0 #Compteur du Nombre de lignes dans le fichier $cnt_file
+		cnt_OK=0 #Nombre de CRC_OK
+		cnt_BAD=0 #Nombre de CRC_BAD
+		cnt_NO=0 #Nombre de NO_CRC
+		cnt_UNDEF=0 #Nombre de UNDEF
+    	log_file=$(($log_file+1))
+    	new_data_file=$data\_$log_file
+    	mv $data $new_data_file
+    	read first_line < $new_data_file
+		echo "$first_line" > $data
+		cnt=0
+    	while read line
+		do
+		    if [ $cnt -eq $cnt_limit ] ; then #on ne compte qu'à partir du dernier message "vu" précédemment
+		    	cnt_limit=0
+		    fi
+		    if [ $cnt_limit -eq 0 ] ; then
+		    	echo "$line" >> $data
+		    fi
+		    cnt=$(($cnt+1))
+		done < $new_data_file
+    	read_data
+    fi
+    echo "nb_msg    	$(($cnt - 1))" > $cnt_file
+    echo "cnt_OK    	$cnt_OK" >> $cnt_file
+    echo "cnt_BAD   	$cnt_BAD" >> $cnt_file
+    echo "cnt_NO    	$cnt_NO" >> $cnt_file
+    echo "cnt_UNDEF 	$cnt_UNDEF" >> $cnt_file
+    echo "log_file	$log_file" >> $cnt_file
+
+    #echo "OK=$cnt_OK	cnt=$cnt	cnt-1=$(($cnt-1))"
+    #vérification du pourcentage de perte
+    result=$(awk "BEGIN {printf \"%.2f\",${cnt_OK}/(${cnt}-1)*100}")
+    result=$(awk "BEGIN {printf \"%d\",${result}}")
+    #echo "result = $result"
+    if [ $result -lt 90 ] ; then
+	echo "CRITICAL : more than 10% loss -> OK : $cnt_OK/$(($cnt - 1)) - BAD : $cnt_BAD/$(($cnt - 1)) - NO : $cnt_NO/$(($cnt - 1)) - UNDEF : $cnt_UNDEF/$(($cnt - 1))"
+	exit 2
+    fi
+
+    echo "OK : $cnt_OK/$(($cnt - 1)) - BAD : $cnt_BAD/$(($cnt - 1)) - NO : $cnt_NO/$(($cnt - 1)) - UNDEF : $cnt_UNDEF/$(($cnt - 1))"
+    exit 0
+else
+    echo Le fichier n\'existe pas !
+    exit 2
+fi
