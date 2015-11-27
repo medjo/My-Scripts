@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Date : 2015 november 15th
+# Creation date :  november 2015
 # This script requires that the following programs be installed
 # on your computer:
 # - xclip : sudo apt-get install xclip
@@ -25,7 +25,8 @@ DIR_MUSIC=$HOME/Téléchargements/Musique
 # File in which will be stored the videos watched and downloaded
 LOG_FILE=$DIR_VID/history.log
 
-FILENAME_FILE=/tmp/filename_file
+FILENAME_FILE=/tmp/dl_stream_filename
+PREFERENCES_FILE=/tmp/dl_stream_preferences
 
 AUDIO_QUALITY=192k
 AUDIO_FORMAT=mp3
@@ -72,7 +73,8 @@ get_url() {
   #Displays the dialog and its parameter values in 'FORM'
   FORM=`yad --width=700 --title="Youtube-dl" --form --field="URL :"\
     --field="streaming":CHK --field="download":CHK --field="watch later":CHK\
-    --field="music only":CHK  "$DEFAULT_URL" "TRUE" "FALSE" "FALSE" "FALSE"`
+    --field="music only":CHK  "$DEFAULT_URL" "$STREAMING" "$DOWNLOAD"\
+    "$WATCH_LATER" "$MUSIC"`
   echo $FORM
   MEDIA_URL=`echo $FORM | cut -d '|' -f 1`
   STREAMING=`echo $FORM | cut -d '|' -f 2`
@@ -93,6 +95,33 @@ add_to_log() {
   fi
   (FILENAME=$($YTDL --get-filename $MEDIA_URL) &&\
   echo $FILENAME>$FILENAME_FILE && sed -i "1i $(date) : $FILENAME" $LOG_FILE)&
+}
+
+get_preferences() {
+  if [ -e $PREFERENCES_FILE ]; then
+    # read preferences from the file $PREFERENCES_FILE
+    STREAMING=$(sed '1q;d' $PREFERENCES_FILE)
+    DOWNLOAD=$(sed '2q;d' $PREFERENCES_FILE)
+    WATCH_LATER=$(sed '3q;d' $PREFERENCES_FILE)
+    MUSIC=$(sed '4q;d' $PREFERENCES_FILE)
+    echo STREAMING : $STREAMING
+    echo DOWNLOAD : $DOWNLOAD
+    echo WATCH_LATER : $WATCH_LATER
+    echo MUSIC : $MUSIC
+  else
+    # set default preferences
+    STREAMING="TRUE"
+    DOWNLOAD="FALSE"
+    WATCH_LATER="FALSE"
+    MUSIC="FALSE"
+  fi
+}
+
+set_preferences() {
+  echo "$STREAMING" > $PREFERENCES_FILE
+  echo "$DOWNLOAD" >> $PREFERENCES_FILE
+  echo "$WATCH_LATER" >> $PREFERENCES_FILE
+  echo "$MUSIC" >> $PREFERENCES_FILE
 }
 
 wait_for_filename() {
@@ -125,6 +154,12 @@ wait_all() {
   wait_for_file
 }
 
+
+#######################
+# START OF THE SCRIPT #
+#######################
+
+get_preferences
 #Get URL and parameters from User Interface
 #And Checks if the parameters are valid
 while [ true ]
@@ -146,7 +181,8 @@ do
   fi
   break
 done
-
+set_preferences
+exit 0
 add_to_log
 
 #Processing parameters
