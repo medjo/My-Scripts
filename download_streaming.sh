@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Creation date :  november 2015
 # This script requires that the following programs be installed
@@ -31,7 +31,6 @@ PREFERENCES_FILE=/tmp/dl_stream_preferences
 AUDIO_QUALITY=192k
 AUDIO_FORMAT=mp3
 
-PLAYER="vlc --no-video-title-show"
 
 YTDL="youtube-dl -c"
 #--prefer-ffmpeg"
@@ -45,31 +44,8 @@ YTDL="youtube-dl -c"
 # -g, --get-url      simulate, quite but print URL
 # --get-filename     simulate, quiet but print output filename
 
-# DEFAULT_URL verification
-# Selection content (it is supposed to contain the url of the video or music)
-SELECTION=$(xclip -o 2> /dev/null)
-CLIPBOARD=$(xclip -o -selection clipboard 2> /dev/null)
-DEFAULT_URL=$SELECTION
-if [ -z $DEFAULT_URL ]; then
-  if [ -z $CLIPBOARD ]; then
-    #if clipboard is empty and if nothing has been selected a default url is set
-    DEFAULT_URL="https://www.youtube.com/watch?v="
-  else
-    # if nothing has been selected $DEFAULT_URL takes the value of the clipboard
-    SELECTION=$CLIPBOARD
-    DEFAULT_URL=$CLIPBOARD
-  fi
-else
-  #if something has been selected, the content goes into the clipboard
-  #so that the same content be displayed in the URL field if the script
-  #is launched again
-  echo "$DEFAULT_URL"|xclip -i -selection clipboard
-fi
-#echo "$SELECTION"|xclip -i -selection XA_PRIMARY
-#echo "$CLIPBOARD"|xclip -i -selection clipboard
-
 get_url() {
-  echo DEFAULT_URL : $DEFAULT_URL!
+  echo DEFAULT_URL : $DEFAULT_URL
   #Displays the dialog and its parameter values in 'FORM'
   FORM=`yad --width=700 --title="Youtube-dl" --form --field="URL :"\
     --field="streaming":CHK --field="download":CHK --field="watch later":CHK\
@@ -117,6 +93,14 @@ get_preferences() {
   fi
 }
 
+set_player() {
+  PLAYER="vlc"
+  PLAYER_OPTIONS="--no-video-title-show --input-title-format "
+  TITLE="$FILENAME"
+  echo FILENAME : $FILENAME
+  echo PLAYER : $PLAYER $PLAYER_OPTIONS
+}
+
 set_preferences() {
   echo "$STREAMING" > $PREFERENCES_FILE
   echo "$DOWNLOAD" >> $PREFERENCES_FILE
@@ -159,6 +143,35 @@ wait_all() {
 # START OF THE SCRIPT #
 #######################
 
+
+# DEFAULT_URL verification
+# Selection content (it is supposed to contain the url of the video or music)
+SELECTION=$(xclip -o 2> /dev/null)
+CLIPBOARD=$(xclip -o -selection clipboard 2> /dev/null)
+DEFAULT_URL=$SELECTION
+if [ -z $DEFAULT_URL ]; then
+  echo selection vide
+  if [ -z $CLIPBOARD ]; then
+  echo clipboard vide
+    #if clipboard is empty and if nothing has been selected a default url is set
+    DEFAULT_URL="https://www.youtube.com/watch?v="
+  else
+    # if nothing has been selected $DEFAULT_URL takes the value of the clipboard
+  echo non vide : clipboard : $CLIPBOARD
+    SELECTION=$CLIPBOARD
+    DEFAULT_URL=$CLIPBOARD
+  fi
+else
+  echo selection non vide
+  #if something has been selected, the content goes into the clipboard
+  #so that the same content be displayed in the URL field if the script
+  #is launched again
+  echo "$DEFAULT_URL"|xclip -i -selection clipboard
+fi
+
+#echo "$SELECTION"|xclip -i -selection XA_PRIMARY
+#echo "$CLIPBOARD"|xclip -i -selection clipboard
+
 get_preferences
 #Get URL and parameters from User Interface
 #And Checks if the parameters are valid
@@ -198,7 +211,8 @@ if [ $MUSIC = "TRUE" ]; then
   elif [ $STREAMING = "TRUE" ]; then
     #Listening to music in streaming without keeping the music
     echo Listening to music in streaming without keeping the music
-    $YTDL -x -g $MEDIA_URL | xargs $PLAYER
+    wait_for_filename && set_player && $YTDL -x -g $MEDIA_URL|xargs $PLAYER \
+      $PLAYER_OPTIONS "$TITLE"
   else
     #Downloading music in $DIR_MUSIC without listening to it
     echo Downloading music in $DIR_MUSIC without listening to it
@@ -236,7 +250,8 @@ else
   else
     #Watching the video in streaming and not keeping the video
     echo Watching the video in streaming and not keeping the video
-    $YTDL -g $MEDIA_URL | xargs $PLAYER
+    wait_for_filename && set_player && $YTDL -g $MEDIA_URL|xargs $PLAYER \
+      $PLAYER_OPTIONS "$TITLE"
   fi
 fi
 exit 0
