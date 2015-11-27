@@ -26,6 +26,9 @@
 # Then add the following line :
 # 0 * * * * path/to/this/script.sh
 
+#******************************************************************************#
+
+
 BASE_DIR="$HOME/Documents"
 LOCAL_BACKUP="$HOME/Documents/Backup/Documents"
 REMOTE_PATH="/Root/Backup"
