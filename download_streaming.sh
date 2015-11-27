@@ -182,7 +182,7 @@ do
   break
 done
 set_preferences
-exit 0
+
 add_to_log
 
 #Processing parameters
