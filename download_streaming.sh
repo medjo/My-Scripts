@@ -1,17 +1,30 @@
 #!/bin/bash
 
+#******************************************************************************#
+#                       DESCRIPTION                                            #
+#******************************************************************************#
 # Creation date :  november 2015
+#
+# This script will allow you to :
+# - watch in streaming with your favorite player videos from the web
+# - download videos and musics from youtube and other websites
+# - download videos to be watched later in a special folder (better than keeping
+# an open tab in your browser)
+#
+#
 # This script requires that the following programs be installed
 # on your computer:
 # - xclip : sudo apt-get install xclip
 # - yad (yet another dialog) : http://sourceforge.net/projects/yad-dialog/
-# - youtube-dl : sudo apt-get install youtube-dl
+# - youtube-dl :
 # sudo add-apt-repository ppa:nilarimogard/webupd8
 # sudo apt-get update
 # sudo apt-get upgrade
 # sudo apt-get install youtube-dl
 #
 # To run this script on keys pressed, you can use 'xbindkeys'
+#
+#******************************************************************************#
 
 # Directory in which will be downloaded videos to download or watch in streaming
 DIR_VID=$HOME/Vidéos/From_Web
