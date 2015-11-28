@@ -199,43 +199,49 @@ set_preferences
 add_to_log
 
 #Processing parameters
-if [ $MUSIC = "TRUE" ]; then
+if [ "$MUSIC" = "TRUE" ]; then
   #A music will be downloaded or listened in streaming
-  mkdir -p $DIR_MUSIC
-  if [ $WATCH_LATER = "TRUE" || $DOWNLOAD = "TRUE" ]; then
-    if [ $STREAMING = "TRUE" ]; then
+  mkdir -p "$DIR_MUSIC"
+  if [[ "$WATCH_LATER" = "TRUE" || "$DOWNLOAD" = "TRUE" ]]; then
+    if [ "$STREAMING" = "TRUE" ]; then
       #Listening to music in streaming and keeping the music file in $DIR_MUSIC
       echo Listening to music in streaming and keeping the music file in\
-        $DIR_MUSIC
+        "$DIR_MUSIC"
+    else
+      #Downloading music in $DIR_MUSIC without listening to it
+      echo Downloading music in "$DIR_MUSIC" without listening to it
+      $YTDL -x --audio-format "$AUDIO_FORMAT" --audio-quality "$AUDIO_QUALITY"\
+        -o "$DIR_MUSIC/%(title)s-%(id)s.%(ext)s" $MEDIA_URL
     fi
-  elif [ $STREAMING = "TRUE" ]; then
+  elif [ "$STREAMING" = "TRUE" ]; then
     #Listening to music in streaming without keeping the music
     echo Listening to music in streaming without keeping the music
     wait_for_filename && set_player && $YTDL -x -g $MEDIA_URL|xargs $PLAYER \
       $PLAYER_OPTIONS "$TITLE"
   else
     #Downloading music in $DIR_MUSIC without listening to it
-    echo Downloading music in $DIR_MUSIC without listening to it
-    $YTDL -x --audio-format $AUDIO_FORMAT --audio-quality $AUDIO_QUALITY
+    echo Downloading music in "$DIR_MUSIC" without listening to it
+    $YTDL -x --audio-format "$AUDIO_FORMAT" --audio-quality "$AUDIO_QUALITY"\
+      -o "$DIR_MUSIC/%(title)s-%(id)s.%(ext)s" $MEDIA_URL
   fi
 else
   #A video will be downloaded or listened in streaming or watched later
-  if [ $WATCH_LATER = "TRUE" ]; then
-    mkdir -p $DIR_VID_LATER
-    if [ $STREAMING = "TRUE" ]; then
+  if [ "$WATCH_LATER" = "TRUE" ]; then
+    mkdir -p "$DIR_VID_LATER"
+    if [ "$STREAMING" = "TRUE" ]; then
       #Watching the video in streaming and keeping the video in $DIR_VID_LATER
       echo Watching the video in streaming and keeping the video in \
-        $DIR_VID_LATER
+        "$DIR_VID_LATER"
       FILENAME=`$YTDL --get-filename $MEDIA_URL`
       $YTDL -o "$DIR_VID_LATER/%(title)s-%(id)s.%(ext)s" --no-part $MEDIA_URL &\
         wait_all && $PLAYER "$DIR_VID_LATER/$FILENAME"
     else
       #Downloading the video in $DIR_VID_LATER
       echo Downloading the video in $DIR_VID_LATER
-      $YTDL -o "$DIR_VID_LATER/%(title)s-%(id)s.%(ext)s" $MEDIA_URL
+      $YTDL -o "$DIR_VID_LATER/%(title)s-%(id)s.%(ext)s" "$MEDIA_URL"
     fi
   elif [ $DOWNLOAD = "TRUE" ]; then
-    mkdir -p $DIR_VID
+    mkdir -p "$DIR_VID"
     if [ $STREAMING = "TRUE" ]; then
       #Watching the video in streaming and keeping the video in $DIR_VID
       echo Watching the video in streaming and keeping the video in $DIR_VID
@@ -244,7 +250,7 @@ else
         wait_all && $PLAYER "$DIR_VID/$FILENAME"
     else
       #Downloading the video in $DIR_VID without watching it
-      echo Downloading the video in $DIR_VID without watching it
+      echo Downloading the video in "$DIR_VID" without watching it
       $YTDL -o "$DIR_VID/%(title)s-%(id)s.%(ext)s" $MEDIA_URL
     fi
   else
