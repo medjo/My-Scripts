@@ -51,7 +51,7 @@ get_url() {
     --field="streaming":CHK --field="download":CHK --field="watch later":CHK\
     --field="music only":CHK  "$DEFAULT_URL" "$STREAMING" "$DOWNLOAD"\
     "$WATCH_LATER" "$MUSIC"`
-  echo $FORM
+  #echo $FORM
   MEDIA_URL=`echo $FORM | cut -d '|' -f 1`
   STREAMING=`echo $FORM | cut -d '|' -f 2`
   DOWNLOAD=`echo $FORM | cut -d '|' -f 3`
@@ -80,10 +80,10 @@ get_preferences() {
     DOWNLOAD=$(sed '2q;d' $PREFERENCES_FILE)
     WATCH_LATER=$(sed '3q;d' $PREFERENCES_FILE)
     MUSIC=$(sed '4q;d' $PREFERENCES_FILE)
-    echo STREAMING : $STREAMING
-    echo DOWNLOAD : $DOWNLOAD
-    echo WATCH_LATER : $WATCH_LATER
-    echo MUSIC : $MUSIC
+    #echo STREAMING : $STREAMING
+    #echo DOWNLOAD : $DOWNLOAD
+    #echo WATCH_LATER : $WATCH_LATER
+    #echo MUSIC : $MUSIC
   else
     # set default preferences
     STREAMING="TRUE"
@@ -139,9 +139,9 @@ wait_all() {
 }
 
 
-#######################
-# START OF THE SCRIPT #
-#######################
+##########################
+# BEGINING OF THE SCRIPT #
+##########################
 
 
 # DEFAULT_URL verification
@@ -150,19 +150,19 @@ SELECTION=$(xclip -o 2> /dev/null)
 CLIPBOARD=$(xclip -o -selection clipboard 2> /dev/null)
 DEFAULT_URL=$SELECTION
 if [ -z $DEFAULT_URL ]; then
-  echo selection vide
+  #echo selection vide
   if [ -z $CLIPBOARD ]; then
-  echo clipboard vide
+  #echo clipboard vide
     #if clipboard is empty and if nothing has been selected a default url is set
     DEFAULT_URL="https://www.youtube.com/watch?v="
   else
     # if nothing has been selected $DEFAULT_URL takes the value of the clipboard
-  echo non vide : clipboard : $CLIPBOARD
+  #echo non vide : clipboard : $CLIPBOARD
     SELECTION=$CLIPBOARD
     DEFAULT_URL=$CLIPBOARD
   fi
 else
-  echo selection non vide
+  #echo selection non vide
   #if something has been selected, the content goes into the clipboard
   #so that the same content be displayed in the URL field if the script
   #is launched again
