@@ -1,4 +1,6 @@
 #!/bin/sh
+# Procedure explained here :
+# https://www.raspberrypi.org/documentation/installation/installing-images/linux.md
 DEVICE_NAME=/dev/mmcblk0
 RASBIAN_IMG=~/Téléchargements/2016-02-09-raspbian-jessie.img
 if [ -e $DEVICE_NAME ]; then
