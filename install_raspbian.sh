@@ -2,7 +2,7 @@
 # Procedure explained here :
 # https://www.raspberrypi.org/documentation/installation/installing-images/linux.md
 DEVICE_NAME=/dev/mmcblk0
-RASBIAN_IMG=~/Téléchargements/2016-02-09-raspbian-jessie.img
+RASBIAN_IMG=~/Téléchargements/2016-09-23-raspbian-jessie.img
 if [ -e $DEVICE_NAME ]; then
   echo The SD card is plugged in.
   if [ -e $RASBIAN_IMG  ]; then
