@@ -1,0 +1,47 @@
+#! /bin/bash
+
+# This script is a workaround for the non working shortcuts (fn+F5 backlight
+# darker, fn+F6 backlight brighter, fn+F7 backlight OFF/ON) on my asus zenbook
+# running Ubuntu 16.04.
+# It must be called using one of these three commands : "set_backlight up"
+# "set_backlight down" or "set_backlight toggle".
+# I configured my Ubuntu to bind each of these commands with one of the
+# following shortcuts : "CTRL+SUPER+F5", "CTRL+SUPER+F6", "CTRL+SUPER+F7"
+
+PREV_BL_VAL=/tmp/prev_backlight_value 
+BACKLIGHT=$(xbacklight|cut -d . -f 1)
+
+if [ $BACKLIGHT -le 15 ];
+then
+    if [ $BACKLIGHT -le 6 ];
+    then
+        STEP=1
+    else
+        STEP=2
+    fi
+else
+    STEP=10
+fi
+
+if [ "$1" == "up" ];
+then
+    xbacklight +$STEP
+elif [ "$1" == "down" ];
+then
+    xbacklight -$STEP
+elif [ "$1" == "toggle" ];
+then
+    if [ $BACKLIGHT -eq 0 ];
+    then
+        if [ -e $PREV_BL_VAL ];
+        then
+            BACKLIGHT=$(cat $PREV_BL_VAL)
+            xbacklight =$BACKLIGHT
+        else
+            xbacklight =50
+        fi
+    else
+        echo $BACKLIGHT > $PREV_BL_VAL
+        xbacklight =0
+    fi
+fi
