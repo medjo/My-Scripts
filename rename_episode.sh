@@ -9,6 +9,17 @@
 
 echo "Enter the name of the serie you want to rename"
 read serie
+
+echo "Enter how the serie appears in the file name (if you enter nothing, \
+only the files containing the correct serie name will be renamed)"
+
+read bad_serie
+
+if [ -z $bad_serie ]
+then
+    bad_serie=$serie
+fi
+
 apply=false
 video_search=0
 
@@ -40,9 +51,9 @@ do
                 count=$(( count + 1 ))
                 if [ $video_search -eq 0 ]
                 then
-                    bad_file=`ls -1| egrep -i -m 1 "[[:print:]]*${serie}[[:print:]]+($season_ep[^p]|${season}(e|x)${ep})[[:print:]]*\.(srt)$" 2> /dev/null`
+                    bad_file=`ls -1| egrep -i -m 1 "[[:print:]]*${bad_serie}[[:print:]]+($season_ep[^p]|${season}(e|x)${ep})[[:print:]]*\.(srt)$" 2> /dev/null`
                 else
-                    bad_file=`ls -1| egrep -i -m 1 "[[:print:]]*${serie}[[:print:]]+($season_ep[^p]|${season}(e|x)${ep})[[:print:]]*\.(mkv|flv|avi|mp4)$" 2> /dev/null`
+                    bad_file=`ls -1| egrep -i -m 1 "[[:print:]]*${bad_serie}[[:print:]]+($season_ep[^p]|${season}(e|x)${ep})[[:print:]]*\.(mkv|flv|avi|mp4)$" 2> /dev/null`
                 fi
                 video_search=$((!$video_search))
 
