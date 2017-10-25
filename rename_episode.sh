@@ -49,15 +49,15 @@ do
             while [ $count -lt 2 ]
             do
                 count=$(( count + 1 ))
-                if [ $video_search -eq 0 ]
+                if [ "$video_search" -eq 0 ]
                 then
-                    bad_file=`ls -1| egrep -i -m 1 "[[:print:]]*${bad_serie}[[:print:]]+($season_ep[^p]|${season}(e|x)${ep})[[:print:]]*\.(srt)$" 2> /dev/null`
+                    bad_file=`ls -1| egrep -i -m 1 "[[:print:]]*${bad_serie}[[:print:]]+($season_ep[^p]|${season}(e|x)${ep})[^[:alpha:]][[:print:]]*\.(srt)$" 2> /dev/null`
                 else
-                    bad_file=`ls -1| egrep -i -m 1 "[[:print:]]*${bad_serie}[[:print:]]+($season_ep[^p]|${season}(e|x)${ep})[[:print:]]*\.(mkv|flv|avi|mp4)$" 2> /dev/null`
+                    bad_file=`ls -1| egrep -i -m 1 "[[:print:]]*${bad_serie}[[:print:]]+($season_ep[^p]|${season}(e|x)${ep})[^[:alpha:]][[:print:]]*\.(mkv|flv|avi|mp4)$" 2> /dev/null`
                 fi
                 video_search=$((!$video_search))
 
-                extension=`echo $bad_file |tail -c 4`
+                extension=`echo "$bad_file" |tail -c 4`
                 file_name="${serie} ${season}x${ep}.${extension}"
 
                 #echo file_name : $file_name
@@ -65,26 +65,30 @@ do
 
                 if [ -e "$bad_file" ]
                 then
-                    if [[ $bad_file == $file_name ]]
+                    if [[ "$bad_file" == "$file_name" ]]
                     then
                         continue
                     fi
-                    if [[ $apply == true ]]
+                    if [[ "$apply" == true ]]
                     then
                         mv "$bad_file" "$file_name"
                     else
                         echo "$bad_file --> $file_name"
+                        if [[ "$extension" != "srt" ]]
+                        then
+                            echo
+                        fi
                     fi
                 fi
             done
         done
     done
 
-    if [[ $apply != true ]]
+    if [[ "$apply" != true ]]
     then
         echo "Do you wish to apply the changes ? [y/N]"
         read apply
-        if [[ $apply == y ]] || [[ $apply == Y ]]
+        if [[ "$apply" == y ]] || [[ "$apply" == Y ]]
         then
             apply=true
         else
