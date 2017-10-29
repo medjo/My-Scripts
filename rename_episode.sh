@@ -25,7 +25,7 @@ video_search=0
 
 while true
 do
-    for season in {01..20}
+    for season in {01..18}
     do
         if [ $season -lt 10 ]
         then
