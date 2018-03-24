@@ -52,10 +52,10 @@ do
                 if [ "$video_search" -eq 0 ]
                 then
                     #bad_file=`ls -1| egrep -i -m 1 "[[:print:]]*${bad_serie}[[:print:]]+($season_ep|${season}(e|x)${ep})[^[:alnum:]][[:print:]]*\.(srt)$" 2> /dev/null`
-                    bad_file=`ls -1| egrep -i -m 1 "[[:print:]]*${bad_serie}[[:print:]]*([^[:alnum:]]$season_ep|${season}(e|x)${ep})[^[:alnum:]]*[[:print:]]*\.(srt)$" 2> /dev/null`
+                    bad_file=`ls -1| egrep -i -m 1 "[[:print:]]*${bad_serie}[[:print:]]*([^[:alnum:]]$season_ep[^p]|${season}(e|x)${ep})[^[:alnum:]]*[[:print:]]*\.(srt)$" 2> /dev/null`
                 else
                     #bad_file=`ls -1| egrep -i -m 1 "[[:print:]]*${bad_serie}[[:print:]]+($season_ep|${season}(e|x)${ep})[^[:alnum:]][[:print:]]*\.(mkv|flv|avi|mp4)$" 2> /dev/null`
-                    bad_file=`ls -1| egrep -i -m 1 "[[:print:]]*${bad_serie}[[:print:]]*([^[:alnum:]]$season_ep|${season}(e|x)${ep})[^[:alnum:]]*[[:print:]]*\.(mkv|flv|avi|mp4)$" 2> /dev/null`
+                    bad_file=`ls -1| egrep -i -m 1 "[[:print:]]*${bad_serie}[[:print:]]*([^[:alnum:]]$season_ep[^p]|${season}(e|x)${ep})[^[:alnum:]]*[[:print:]]*\.(mkv|flv|avi|mp4)$" 2> /dev/null`
                 fi
                 video_search=$((!$video_search))
 
