@@ -12,12 +12,12 @@ confirmed = False
 DEBUG = False
 
 while True:
-    i = 0
+    #i = 0
     print()
     for file in os.listdir("."):
         # We only treat files with a particular extension
-        if (file.endswith(".mkv") or file.endswith(".srt") or file.endswith(".srt")
-                or file.endswith(".srt") or file.endswith(".srt")):
+        if (file.endswith(".mkv") or file.endswith(".srt") or file.endswith(".avi")
+                or file.endswith(".mp4") or file.endswith(".flv")):
 
             name_season_ep = file[:file.rfind(".")]
             season = name_season_ep[-5:-3]
@@ -44,9 +44,9 @@ while True:
             if (confirmed):
                 os.makedirs(target_dir, exist_ok=True)
                 os.rename(file, target_dir+file)
-        if i >= 1:
-            break
-        i += 1
+        #if i >= 1:
+        #    break
+        #i += 1
 
     if confirmed:
         print("Changed applied.\nExiting.")
