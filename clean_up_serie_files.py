@@ -20,8 +20,9 @@ while True:
                 or file.endswith(".mp4") or file.endswith(".flv")):
 
             name_season_ep = file[:file.rfind(".")]
-            season = name_season_ep[-5:-3]
-            name = name_season_ep[:-6]
+            x_index = name_season_ep.rfind("x")
+            season = name_season_ep[x_index - 2:x_index]
+            name = name_season_ep[:x_index - 3]
 
             if DEBUG == True:
                 print()
